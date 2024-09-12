@@ -4,9 +4,13 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>fa8627b4-aafb-4fb7-a6f6-47eaf8a5e603</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
@@ -23,9 +27,6 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Abstractions\" />
-    <Folder Include="Authentication\" />
-    <Folder Include="Contracts.cs\" />
     <Folder Include="Errors\" />
     <Folder Include="Extensions\" />
     <Folder Include="Health\" />
