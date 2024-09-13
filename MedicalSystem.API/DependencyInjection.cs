@@ -1,6 +1,7 @@
 ﻿using MedicalSystem.API.Authentication;
 using MedicalSystem.API.Entities;
 using MedicalSystem.API.Persistence;
+using MedicalSystem.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,10 @@ namespace MedicalSystem.API
 
 			var connectionStrings = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection String DefaultConnection not found.");
 			services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionStrings));
+
+
+
+			services.AddScoped<IAuthService, AuthService>();
 
 			return services;
 		}
