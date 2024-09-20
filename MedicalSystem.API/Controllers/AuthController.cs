@@ -15,15 +15,32 @@ namespace MedicalSystem.API.Controllers
 		{
 			_authService = authService;
 		}
+		[HttpPost("login")]
+		public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
+		{
+			var result = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
+			return result.IsSuccess ? Ok() : BadRequest(result.Error);
+		}
 
 		[HttpPost("register")]
 		public async Task<IActionResult> Register([FromBody] RegisterRequest request,CancellationToken cancellationToken)
 		{
 			var result = await _authService.RegisterAsync(request);
-			if (result)
-				return Ok();
+			return result.IsSuccess ? Ok() : BadRequest(result.Error);
+		}
 
-			return BadRequest();
+		[HttpPost("refresh-token")]
+		public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+		{
+			var result = await _authService.GetRefreshToken(request.Token, request.RefreshToken, cancellationToken);
+			return result.IsSuccess ? Ok() : BadRequest(result.Error);
+		}
+
+		[HttpPost("revoke-refresh-token")]
+		public async Task<IActionResult> RevokeRefreshToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+		{
+			var result = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+			return result.IsSuccess ? Ok() : BadRequest(result.Error);
 		}
 	}
 }

@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Errors\" />
     <Folder Include="Extensions\" />
     <Folder Include="Health\" />
     <Folder Include="Settings\" />
