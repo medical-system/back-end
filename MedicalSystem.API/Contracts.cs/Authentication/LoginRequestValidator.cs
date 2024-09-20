@@ -3,17 +3,13 @@ using MedicalSystem.API.Abstractions.Consts;
 
 namespace MedicalSystem.API.Contracts.cs.Authentication
 {
-	public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
+	public class LoginRequestValidator : AbstractValidator<LoginRequest>
 	{
-		public RegisterRequestValidator()
+		public LoginRequestValidator()
 		{
 			RuleFor(x => x.Email)
 				.NotEmpty()
 				.EmailAddress();
-
-			RuleFor(x => x.FullName)
-				.NotEmpty()
-				.Length(3, 100);
 
 			RuleFor(x => x.Password)
 				.NotEmpty()
