@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MedicalSystem.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240912230434_AddApplicationUserAndApplicationRoleTables")]
-    partial class AddApplicationUserAndApplicationRoleTables
+    [Migration("20241003043541_AddAuthTables")]
+    partial class AddAuthTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,6 +56,26 @@ namespace MedicalSystem.API.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "92b75286-d8f8-4061-9995-e6e23ccdee94",
+                            ConcurrencyStamp = "f51e5a91-bced-49c2-8b86-c2e170c0846c",
+                            IsDefault = false,
+                            IsDeleted = false,
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "9eaa03df-8e4f-4161-85de-0f6e5e30bfd4",
+                            ConcurrencyStamp = "5ee6bc12-5cb0-4304-91e7-6a00744e042a",
+                            IsDefault = false,
+                            IsDeleted = false,
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("MedicalSystem.API.Entities.ApplicationUser", b =>
@@ -134,6 +154,27 @@ namespace MedicalSystem.API.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "6dc6528a-b280-4770-9eae-82671ee81ef7",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "99d2bbc6-bc54-4248-a172-a77de3ae4430",
+                            Email = "admin@medical-system.com",
+                            EmailConfirmed = true,
+                            FirstName = "Medical System",
+                            IsDisabled = false,
+                            LastName = "Admin",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@MEDICAL-SYSTEM.COM",
+                            NormalizedUserName = "ADMIN@MEDICAL-SYSTEM.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEQN6wgxlfDd8AwrEjBsak25PDHosTRoI4LtTQpkLIBnpC1Q21MluoPE8Th1V6/e+g==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@medical-system.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -240,6 +281,43 @@ namespace MedicalSystem.API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("MedicalSystem.API.Entities.ApplicationUser", b =>
+                {
+                    b.OwnsMany("MedicalSystem.API.Entities.RefreshToken", "RefreshToken", b1 =>
+                        {
+                            b1.Property<string>("ApplicationUserId")
+                                .HasColumnType("nvarchar(450)");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<DateTime>("CreatedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime>("ExpiresOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime?>("RevokedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Token")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("ApplicationUserId", "Id");
+
+                            b1.ToTable("RefreshToken");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ApplicationUserId");
+                        });
+
+                    b.Navigation("RefreshToken");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
