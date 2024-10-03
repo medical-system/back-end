@@ -12,17 +12,17 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 			builder.HasData([
 				new ApplicationRole
 				{
-					Id =DefaultRoless.AdminRoleId,
-					Name = DefaultRoless.Admin,
-					NormalizedName = DefaultRoless.Admin.ToUpper(),
-					ConcurrencyStamp = DefaultRoless.AdminRoleConcurrencyStamp
+					Id =DefaultRoles.AdminRoleId,
+					Name = DefaultRoles.Admin,
+					NormalizedName = DefaultRoles.Admin.ToUpper(),
+					ConcurrencyStamp = DefaultRoles.AdminRoleConcurrencyStamp
 				},
 				new ApplicationRole
 				{
-					Id= DefaultRoless.UserRoleId,
-					Name = DefaultRoless.User,
-					NormalizedName = DefaultRoless.User.ToUpper(),
-					ConcurrencyStamp = DefaultRoless.UserRoleConcurrencyStamp
+					Id= DefaultRoles.UserRoleId,
+					Name = DefaultRoles.User,
+					NormalizedName = DefaultRoles.User.ToUpper(),
+					ConcurrencyStamp = DefaultRoles.UserRoleConcurrencyStamp
 				}
 			]);
 		}

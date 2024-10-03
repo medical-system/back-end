@@ -1,6 +1,6 @@
 ﻿namespace MedicalSystem.API.Abstractions.Consts
 {
-	public static class DefaultRoless
+	public static class DefaultRoles
 	{
 		public const string Admin = nameof(Admin);
 		public const string AdminRoleId = "92b75286-d8f8-4061-9995-e6e23ccdee94";

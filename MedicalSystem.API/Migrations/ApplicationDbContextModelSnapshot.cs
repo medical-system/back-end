@@ -166,7 +166,7 @@ namespace MedicalSystem.API.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MEDICAL-SYSTEM.COM",
                             NormalizedUserName = "ADMIN@MEDICAL-SYSTEM.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKZ6Orm9GNsdgwfj1qXwAEvOsNBskD2VDnqdiyvQn+M1ZRwOYzL9P12HUB1Oj77hLQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEQN6wgxlfDd8AwrEjBsak25PDHosTRoI4LtTQpkLIBnpC1Q21MluoPE8Th1V6/e+g==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,

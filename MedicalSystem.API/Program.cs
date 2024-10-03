@@ -1,4 +1,8 @@
 
+using Hangfire;
+using HangfireBasicAuthenticationFilter;
+using Serilog;
+
 namespace MedicalSystem.API
 {
 	public class Program
@@ -6,6 +10,10 @@ namespace MedicalSystem.API
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
+
+			builder.Host.UseSerilog((context, configuration) =>
+				configuration.ReadFrom.Configuration(context.Configuration)
+			);
 
 			builder.Services.AddDependencies(builder.Configuration);
 
@@ -17,6 +25,8 @@ namespace MedicalSystem.API
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+			app.UseSerilogRequestLogging();
+			app.UseHangfireDashboard("/jobs");
 
 			app.UseHttpsRedirection();
 

@@ -1,11 +1,17 @@
-﻿using MedicalSystem.API.Authentication;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using Hangfire;
+using MedicalSystem.API.Authentication;
 using MedicalSystem.API.Entities;
 using MedicalSystem.API.Persistence;
 using MedicalSystem.API.Services;
+using MedicalSystem.API.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
 
 namespace MedicalSystem.API
@@ -17,15 +23,24 @@ namespace MedicalSystem.API
 			services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			services.AddEndpointsApiExplorer();
-			services.AddSwaggerServices();
 			services.AddAuthConfig(configuration);
+			services.AddBackgroundJobsConfig(configuration);
 
 			var connectionStrings = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection String DefaultConnection not found.");
 			services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionStrings));
 
+			services
+				.AddSwaggerServices()
+				.AddFluentValidationConfig();
 
 
 			services.AddScoped<IAuthService, AuthService>();
+			services.AddScoped<IEmailSender, EmailService>();
+
+			services.AddOptions<MailSettings>()
+				.BindConfiguration(nameof(MailSettings))
+				.ValidateDataAnnotations()
+				.ValidateOnStart();
 
 			return services;
 		}
@@ -35,6 +50,14 @@ namespace MedicalSystem.API
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			services.AddEndpointsApiExplorer();
 			services.AddSwaggerGen();
+
+			return services;
+		}
+		private static IServiceCollection AddFluentValidationConfig(this IServiceCollection services)
+		{
+			services
+				.AddFluentValidationAutoValidation()
+				.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 			return services;
 		}
@@ -77,6 +100,18 @@ namespace MedicalSystem.API
 				options.SignIn.RequireConfirmedEmail = true;
 				options.User.RequireUniqueEmail = true;
 			});
+
+			return services;
+		}
+		private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services, IConfiguration configuration)
+		{
+			services.AddHangfire(config => config
+					.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+					.UseSimpleAssemblyNameTypeSerializer()
+					.UseRecommendedSerializerSettings()
+					.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+
+			services.AddHangfireServer();
 
 			return services;
 		}
