@@ -80,16 +80,18 @@ namespace MedicalSystem.API.Services
 			var user = request.Adapt<ApplicationUser>();
 			user.UserName = request.FullName;
 			user.Email = request.Email;
+			user.EmailConfirmed = true;
 
 			var result = await _userManger.CreateAsync(user, request.Password);
 
 			if (result.Succeeded)
 			{
-				var code = await _userManger.GenerateEmailConfirmationTokenAsync(user);
-				code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-				_logger.LogInformation("Confirmation Code {code}", code);
+				//var code = await _userManger.GenerateEmailConfirmationTokenAsync(user);
+				//code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+				//_logger.LogInformation("Confirmation Code {code}", code);
 
-				await SendConfirmationEmailAsync(user, code);
+				//await SendConfirmationEmailAsync(user, code);
+				await _userManger.AddToRoleAsync(user, DefaultRoles.User);
 
 				return Result.Success();
 			}
@@ -138,7 +140,7 @@ namespace MedicalSystem.API.Services
 		public async Task<Result> ConfirmEmailAsync(ConfirmEmailRequest request)
 		{
 			var user = await _userManger.FindByIdAsync(request.UserId);
-			if(user is null)
+			if (user is null)
 				return Result.Failure(UserErrors.UserNotFound);
 
 			if (user.EmailConfirmed)
