@@ -6,6 +6,8 @@ namespace MedicalSystem.API.Entities
 	{
 		public string FirstName { get; set; } = string.Empty;
 		public string LastName { get; set; } = string.Empty;
+		public string FullName { get; set; } = string.Empty;
+		public string Password { get; set; } = string.Empty;
 		public bool IsDisabled { get; set; }
 		public List<RefreshToken> RefreshToken { get; set; } = [];
 	}

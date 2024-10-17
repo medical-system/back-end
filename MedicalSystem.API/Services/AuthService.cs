@@ -78,9 +78,11 @@ namespace MedicalSystem.API.Services
 			if (emailExsists)
 				return Result.Failure(UserErrors.DuplicatedEmail);
 			var user = request.Adapt<ApplicationUser>();
-			user.UserName = request.FullName;
+			user.UserName = request.Email;
+			user.FullName =	request.FullName;
 			user.Email = request.Email;
 			user.EmailConfirmed = true;
+			user.Password = request.Password;
 
 			var result = await _userManger.CreateAsync(user, request.Password);
 

@@ -21,13 +21,15 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 					FirstName = "Medical System",
 					LastName = "Admin",
 					UserName = DefaultUsers.AdminEmail,
+					FullName = DefaultUsers.AdminFullName,
 					NormalizedUserName = DefaultUsers.AdminEmail.ToUpper(),
 					Email = DefaultUsers.AdminEmail,
 					NormalizedEmail = DefaultUsers.AdminEmail.ToUpper(),
 					SecurityStamp = DefaultUsers.AdminSecurityStamp,
 					ConcurrencyStamp = DefaultUsers.AdminConcurrencyStamp,
 					EmailConfirmed = true,
-					PasswordHash = passwordHasher.HashPassword(null!, DefaultUsers.AdminPassword)
+					PasswordHash = passwordHasher.HashPassword(null!, DefaultUsers.AdminPassword),
+					Password = DefaultUsers.AdminPassword
 				});
 		}
 	}

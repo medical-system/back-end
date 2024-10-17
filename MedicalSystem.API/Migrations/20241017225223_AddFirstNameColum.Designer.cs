@@ -4,6 +4,7 @@ using MedicalSystem.API.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MedicalSystem.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241017225223_AddFirstNameColum")]
+    partial class AddFirstNameColum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,10 +128,6 @@ namespace MedicalSystem.API.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -175,8 +174,7 @@ namespace MedicalSystem.API.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MEDICAL-SYSTEM.COM",
                             NormalizedUserName = "ADMIN@MEDICAL-SYSTEM.COM",
-                            Password = "",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAQ2VfOOXQ5fQxq8/YcNg6LL8nhpi2/IgrHVe9eJ4/a45NcHXIunrmq9hTEUtQqUnw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHYt3FXbHSxBHry4BrBjKUDOANvJCIjw2odtzYVyeV61t8LpXyihaiO3FMyA9rznFQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
