@@ -25,11 +25,13 @@ namespace MedicalSystem.API
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+
+			//app.UseStaticFiles();
 			app.UseSerilogRequestLogging();
 			app.UseHangfireDashboard("/jobs");
 
 			app.UseHttpsRedirection();
-
+			app.UseCors();
 			app.UseAuthorization();
 
 

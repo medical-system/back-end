@@ -20,6 +20,15 @@ namespace MedicalSystem.API
 	{
 		public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
 		{
+
+			services.AddCors(options =>
+				options.AddDefaultPolicy(builder =>
+				builder
+					.AllowAnyMethod()
+					.AllowAnyHeader()
+					.AllowAnyOrigin()
+				)
+			);
 			services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			services.AddEndpointsApiExplorer();

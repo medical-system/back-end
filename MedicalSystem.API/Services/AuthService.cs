@@ -79,6 +79,10 @@ namespace MedicalSystem.API.Services
 				return Result.Failure(UserErrors.DuplicatedEmail);
 			var user = request.Adapt<ApplicationUser>();
 			user.UserName = request.Email;
+			string fullName = request.FullName;
+			string[] nameParts = fullName.Split(' ');
+			user.FirstName = nameParts[0];
+			user.LastName = nameParts.Length > 1 ? nameParts[^1] : string.Empty;
 			user.FullName =	request.FullName;
 			user.Email = request.Email;
 			user.EmailConfirmed = true;
