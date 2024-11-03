@@ -11,10 +11,12 @@ namespace MedicalSystem.API.Contracts.cs.Authentication
                 .NotEmpty()
                 .EmailAddress();
 
-			RuleFor(x => x.Code)
-				 .NotEmpty();
+			RuleFor(x => x.Password)
+				.NotEmpty()
+				.Matches(RegexPatterns.Password)
+				.WithMessage("Passwrod should be at least 6 digits and should contains lower case, nonalphanumeric and uppercase");
 
-			RuleFor(x => x.NewPassword)
+			RuleFor(x => x.ConfirmPassword)
 				.NotEmpty()
 				.Matches(RegexPatterns.Password)
 				.WithMessage("Passwrod should be at least 6 digits and should contains lower case, nonalphanumeric and uppercase");
