@@ -7,18 +7,25 @@ using MimeKit;
 
 namespace MedicalSystem.API.Services
 {
-	public class EmailService(IOptions<MailSettings> maillSettins, ILogger<EmailService> logger) : IEmailSender
+	public class EmailService : IEmailSender
 	{
-		private readonly MailSettings _maillSettins = maillSettins.Value;
-		private readonly ILogger<EmailService> _logger = logger;
+		private readonly MailSettings _mailSettings;
+		private readonly ILogger<EmailService> _logger;
+		public EmailService(IOptions<MailSettings> mailSettings,
+						ILogger<EmailService> logger)
+		{
+			_mailSettings = mailSettings.Value;
+			_logger = logger;
 
+		}
 		public async Task SendEmailAsync(string email, string subject, string htmlMessage)
 		{
 			var message = new MimeMessage
 			{
-				Sender = MailboxAddress.Parse(_maillSettins.Mail),
+				Sender = MailboxAddress.Parse(_mailSettings.Mail),
 				Subject = subject
 			};
+
 			message.To.Add(MailboxAddress.Parse(email));
 
 			var builder = new BodyBuilder
@@ -32,8 +39,9 @@ namespace MedicalSystem.API.Services
 
 			_logger.LogInformation("Sending email to {email}", email);
 
-			smtp.Connect(_maillSettins.Host, _maillSettins.Port, SecureSocketOptions.StartTls);
-			smtp.Authenticate(_maillSettins.Mail, _maillSettins.Password);
+
+			smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+			smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
 			await smtp.SendAsync(message);
 			smtp.Disconnect(true);
 		}

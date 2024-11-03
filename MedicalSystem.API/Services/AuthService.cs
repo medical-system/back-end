@@ -19,7 +19,7 @@ namespace MedicalSystem.API.Services
 {
 	public class AuthService : IAuthService
 	{
-		private readonly UserManager<ApplicationUser> _userManger;
+		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly IJwtProvider _jwtProvider;
 		private readonly int _refreshTokenExpiryDays = 14;
 		private readonly ILogger<AuthService> _logger;
@@ -33,7 +33,7 @@ namespace MedicalSystem.API.Services
 			ILogger<AuthService> logger,
 			IHttpContextAccessor httpContextAccessor)
 		{
-			_userManger = userManager;
+			_userManager = userManager;
 			_jwtProvider = jwtProvider;
 			_signInManager = signInManager;
 			_httpContextAccessor = httpContextAccessor;
@@ -42,7 +42,7 @@ namespace MedicalSystem.API.Services
 		}
 		public async Task<Result<AuthResponse>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
 		{
-			var user = await _userManger.Users.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+			var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
 			if (user == null)
 				return Result.Failure<AuthResponse>(UserErrors.UserNotFound);
 
@@ -65,7 +65,7 @@ namespace MedicalSystem.API.Services
 					Token = refreshToken,
 					ExpiresOn = refreshTokenExpireOn
 				});
-				await _userManger.UpdateAsync(user);
+				await _userManager.UpdateAsync(user);
 				var response = new AuthResponse(user.Id, user.Email, user.UserName!, token, expiresIn, refreshToken, refreshTokenExpireOn);
 				return Result.Success(response);
 			}
@@ -74,7 +74,7 @@ namespace MedicalSystem.API.Services
 		}
 		public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
 		{
-			var emailExsists = await _userManger.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+			var emailExsists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
 			if (emailExsists)
 				return Result.Failure(UserErrors.DuplicatedEmail);
 			var user = request.Adapt<ApplicationUser>();
@@ -83,21 +83,21 @@ namespace MedicalSystem.API.Services
 			string[] nameParts = fullName.Split(' ');
 			user.FirstName = nameParts[0];
 			user.LastName = nameParts.Length > 1 ? nameParts[^1] : string.Empty;
-			user.FullName =	request.FullName;
+			user.FullName = request.FullName;
 			user.Email = request.Email;
 			user.EmailConfirmed = true;
 			user.Password = request.Password;
 
-			var result = await _userManger.CreateAsync(user, request.Password);
+			var result = await _userManager.CreateAsync(user, request.Password);
 
 			if (result.Succeeded)
 			{
-				//var code = await _userManger.GenerateEmailConfirmationTokenAsync(user);
+				//var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 				//code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 				//_logger.LogInformation("Confirmation Code {code}", code);
 
 				//await SendConfirmationEmailAsync(user, code);
-				await _userManger.AddToRoleAsync(user, DefaultRoles.User);
+				await _userManager.AddToRoleAsync(user, DefaultRoles.User);
 
 				return Result.Success();
 			}
@@ -112,7 +112,7 @@ namespace MedicalSystem.API.Services
 			if (userId is null)
 				return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
 
-			var user = await _userManger.FindByIdAsync(userId);
+			var user = await _userManager.FindByIdAsync(userId);
 			if (user is null)
 				return Result.Failure<AuthResponse>(UserErrors.UserNotFound);
 
@@ -138,14 +138,14 @@ namespace MedicalSystem.API.Services
 				Token = refreshToken,
 				ExpiresOn = refreshTokenExpireOn
 			});
-			await _userManger.UpdateAsync(user);
+			await _userManager.UpdateAsync(user);
 			var response = new AuthResponse(user.Id, user.Email, user.UserName!, newToken, newExpiresIn, newrRfreshToken, refreshTokenExpireOn);
 			return Result.Success(response);
 		}
 
 		public async Task<Result> ConfirmEmailAsync(ConfirmEmailRequest request)
 		{
-			var user = await _userManger.FindByIdAsync(request.UserId);
+			var user = await _userManager.FindByIdAsync(request.UserId);
 			if (user is null)
 				return Result.Failure(UserErrors.UserNotFound);
 
@@ -161,10 +161,10 @@ namespace MedicalSystem.API.Services
 			{
 				return Result.Failure(UserErrors.InvalidCode);
 			}
-			var result = await _userManger.ConfirmEmailAsync(user, code);
+			var result = await _userManager.ConfirmEmailAsync(user, code);
 			if (result.Succeeded)
 			{
-				await _userManger.AddToRoleAsync(user, DefaultRoles.User);
+				await _userManager.AddToRoleAsync(user, DefaultRoles.User);
 				return Result.Success();
 			}
 			var error = result.Errors.First();
@@ -173,14 +173,14 @@ namespace MedicalSystem.API.Services
 
 		public async Task<Result> ResendConfirmEmailAsync(ResendConfirmationEmailRequest request)
 		{
-			var user = await _userManger.FindByEmailAsync(request.Email);
+			var user = await _userManager.FindByEmailAsync(request.Email);
 			if (user is null)
 				return Result.Success();
 
 			if (user.EmailConfirmed)
 				return Result.Failure(UserErrors.DuplicatedConfirmation);
 
-			var code = await _userManger.GenerateEmailConfirmationTokenAsync(user);
+			var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 			_logger.LogInformation("Confirmation Code {code}", code);
 
@@ -195,7 +195,7 @@ namespace MedicalSystem.API.Services
 			if (userId is null)
 				return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
 
-			var user = await _userManger.FindByIdAsync(userId);
+			var user = await _userManager.FindByIdAsync(userId);
 			if (user is null)
 				return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
 
@@ -204,21 +204,21 @@ namespace MedicalSystem.API.Services
 				return Result.Failure<AuthResponse>(UserErrors.InvalidRefreshToken);
 
 			userRefreshToken.RevokedOn = DateTime.UtcNow;
-			await _userManger.UpdateAsync(user);
+			await _userManager.UpdateAsync(user);
 			return Result.Success();
 		}
 
 		public async Task<Result> SendResetPasswordCodeAsync(string email)
 		{
 
-			var user = await _userManger.FindByEmailAsync(email);
+			var user = await _userManager.FindByEmailAsync(email);
 			if (user is null)
 				return Result.Success();
 
 			if (!user.EmailConfirmed)
 				return Result.Failure(UserErrors.EmailNotConfirmed);
 
-			var code = await _userManger.GeneratePasswordResetTokenAsync(user);
+			var code = await _userManager.GeneratePasswordResetTokenAsync(user);
 			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 			_logger.LogInformation("Reset Password Code {code}", code);
 
@@ -229,20 +229,16 @@ namespace MedicalSystem.API.Services
 
 		public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)
 		{
-			var user = await _userManger.FindByEmailAsync(request.Email);
-			if (user is null || user.EmailConfirmed)
+			var user = await _userManager.FindByEmailAsync(request.Email);
+
+			if (user is null || !user.EmailConfirmed || request.Password != request.ConfirmPassword)
 				return Result.Failure(UserErrors.InvalidCode);
 
-			IdentityResult result;
-			try
-			{
-				var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
-				result = await _userManger.ResetPasswordAsync(user, code, request.NewPassword);
-			}
-			catch (FormatException)
-			{
-				result = IdentityResult.Failed(_userManger.ErrorDescriber.InvalidToken());
-			}
+			var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+			var requestcode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+			var result = await _userManager.ResetPasswordAsync(user, requestcode, request.Password);
+			user.Password = request.Password;
 
 			if (result.Succeeded)
 				return Result.Success();
@@ -253,7 +249,7 @@ namespace MedicalSystem.API.Services
 
 		private async Task<IEnumerable<string>> GetUserRoles(ApplicationUser user, CancellationToken cancellationToken)
 		{
-			var userRoles = await _userManger.GetRolesAsync(user);
+			var userRoles = await _userManager.GetRolesAsync(user);
 			return userRoles;
 		}
 		private static string GenerateRefreshToken()
@@ -271,7 +267,7 @@ namespace MedicalSystem.API.Services
 					{ "{{action_url}}",$"{origin}/auth/emailConfirmation?userId={user.Id}&code={code}" }
 				}
 			);
-			BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survay Basket: Confirm your email", emailBody));
+			await _emailSender.SendEmailAsync(user.Email!, "✅ Medical System: Confirm your email", emailBody);
 
 			await Task.CompletedTask;
 		}
@@ -280,15 +276,14 @@ namespace MedicalSystem.API.Services
 			var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
 
 			var emailBody = EmailBodyBuilder.GenerateEmailBody("ForgetPassword",
-				new Dictionary<string, string>
-				{
-					{"{{name}}",user.FirstName },
-					{ "{{action_url}}",$"{origin}/auth/forgetPassword?email={user.Email}&code={code}" }
+				 new Dictionary<string, string>
+				 {
+					{ "{{name}}", user.FirstName },
+					{ "{{action_url}}", $"http://localhost:5173/auth/change-password?email={user.Email}" }
 				}
 			);
-			BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survay Basket: Reset your password", emailBody));
+			await _emailSender.SendEmailAsync(user.Email!, "✅ Medical System: Reset Password", emailBody);
 
-			await Task.CompletedTask;
 		}
 	}
 }
