@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
+using Mapster;
+using MapsterMapper;
 using MedicalSystem.API.Authentication;
 using MedicalSystem.API.Entities;
 using MedicalSystem.API.Persistence;
@@ -30,8 +32,7 @@ namespace MedicalSystem.API
 				)
 			);
 			services.AddControllers();
-			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-			services.AddEndpointsApiExplorer();
+
 			services.AddAuthConfig(configuration);
 			services.AddBackgroundJobsConfig(configuration);
 
@@ -46,10 +47,9 @@ namespace MedicalSystem.API
 			services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IEmailSender, EmailService>();
 
-			services.AddOptions<MailSettings>()
-				.BindConfiguration(nameof(MailSettings))
-				.ValidateDataAnnotations()
-				.ValidateOnStart();
+			services.AddMapsterConfig();
+			services.AddHttpContextAccessor();
+			services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
 
 			return services;
 		}
@@ -121,6 +121,15 @@ namespace MedicalSystem.API
 					.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
 
 			services.AddHangfireServer();
+
+			return services;
+		}
+		private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
+		{
+			var mappingConfig = TypeAdapterConfig.GlobalSettings;
+			mappingConfig.Scan(Assembly.GetExecutingAssembly());
+
+			services.AddSingleton<IMapper>(new Mapper(mappingConfig));
 
 			return services;
 		}
