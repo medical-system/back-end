@@ -97,7 +97,7 @@ namespace MedicalSystem.API.Services
 				//_logger.LogInformation("Confirmation Code {code}", code);
 
 				//await SendConfirmationEmailAsync(user, code);
-				await _userManager.AddToRoleAsync(user, DefaultRoles.User);
+				await _userManager.AddToRoleAsync(user, DefaultRoles.Patient);
 
 				return Result.Success();
 			}
