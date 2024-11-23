@@ -46,6 +46,7 @@ namespace MedicalSystem.API
 
 			services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IEmailSender, EmailService>();
+			services.AddScoped<IPatientService, PatientService>();
 
 			services.AddMapsterConfig();
 			services.AddHttpContextAccessor();
