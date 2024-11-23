@@ -23,6 +23,27 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 					Name = DefaultRoles.User,
 					NormalizedName = DefaultRoles.User.ToUpper(),
 					ConcurrencyStamp = DefaultRoles.UserRoleConcurrencyStamp
+				},
+				new ApplicationRole
+				{
+					Id= DefaultRoles.PatientRoleId,
+					Name = DefaultRoles.Patient,
+					NormalizedName = DefaultRoles.Patient.ToUpper(),
+					ConcurrencyStamp = DefaultRoles.PatientRoleConcurrencyStamp
+				},
+				new ApplicationRole
+				{
+					Id= DefaultRoles.DoctorRoleId,
+					Name = DefaultRoles.Doctor,
+					NormalizedName = DefaultRoles.Doctor.ToUpper(),
+					ConcurrencyStamp = DefaultRoles.DoctorRoleConcurrencyStamp
+				},
+				new ApplicationRole
+				{
+					Id= DefaultRoles.ReceptionRoleId,
+					Name = DefaultRoles.Reception,
+					NormalizedName = DefaultRoles.Reception.ToUpper(),
+					ConcurrencyStamp = DefaultRoles.ReceptionRoleConcurrencyStamp
 				}
 			]);
 		}
