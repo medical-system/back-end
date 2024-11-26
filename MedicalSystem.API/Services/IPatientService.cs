@@ -1,5 +1,7 @@
 ﻿using MedicalSystem.API.Abstractions;
+using MedicalSystem.API.Contracts.cs.MedicalRecord;
 using MedicalSystem.API.Contracts.cs.Patients;
+using MedicalSystem.API.Entities;
 
 namespace MedicalSystem.API.Services
 {
@@ -9,5 +11,8 @@ namespace MedicalSystem.API.Services
 		public Task<Result<PatientsResponse>> GetAsync(string id);
 		public Task<Result<PatientsResponse>> AddAsync(CreatePatientRequest request, CancellationToken cancellationToken = default);
 		public Task<Result> ToggleStatus(string id);
+		public Task<int> GetTotalPatientsAsync(CancellationToken cancellationToken = default);
+		public Task<IEnumerable<MedicalRecord>> GetAllMedicalRecordAsync(string userId, CancellationToken cancellationToken = default);
+		public Task<Result<MedicalRecordResponse>> GetPatientMedicalRecord(string id, CreateMedicalRecordRequest request, CancellationToken cancellationToken = default);
 	}
 }

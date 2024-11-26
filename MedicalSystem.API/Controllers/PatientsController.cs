@@ -1,4 +1,5 @@
 ﻿using MedicalSystem.API.Abstractions;
+using MedicalSystem.API.Contracts.cs.MedicalRecord;
 using MedicalSystem.API.Contracts.cs.Patients;
 using MedicalSystem.API.Services;
 using Microsoft.AspNetCore.Http;
@@ -12,8 +13,8 @@ namespace MedicalSystem.API.Controllers
 	public class PatientsController : ControllerBase
 	{
 		private readonly IPatientService _patientService;
-        public PatientsController(IPatientService patientService)
-        {
+		public PatientsController(IPatientService patientService)
+		{
 			_patientService = patientService;
 		}
 		[HttpGet("")]
@@ -35,6 +36,25 @@ namespace MedicalSystem.API.Controllers
 			var result = await _patientService.AddAsync(request, cancellationToken);
 
 			return result.IsSuccess ? CreatedAtAction(nameof(GetById), new { result.Value.Id }, result.Value) : result.ToProblem();
+		}
+
+		[HttpGet("{id}/medical-record")]
+		public async Task<IActionResult> MedicalRecord([FromRoute] string id)
+		{
+			return Ok(await _patientService.GetAllMedicalRecordAsync(id));
+		}
+
+		[HttpGet("count-patient")]
+		public async Task<IActionResult> GetCountPatient(CancellationToken cancellationToken)
+		{
+			return Ok(await _patientService.GetTotalPatientsAsync(cancellationToken));
+		}
+
+		[HttpPost("{id}/medical-record")]
+		public async Task<IActionResult> AddMedicalRecord([FromRoute] string id, [FromBody] CreateMedicalRecordRequest request, CancellationToken cancellationToken)
+		{
+			var result = await _patientService.GetPatientMedicalRecord(id, request, cancellationToken);
+			return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 		}
 
 		[HttpPut("{id}/toggle-status")]
