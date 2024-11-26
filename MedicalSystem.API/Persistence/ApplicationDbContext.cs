@@ -16,5 +16,7 @@ namespace MedicalSystem.API.Persistence
 			modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 			base.OnModelCreating(modelBuilder);
 		}
+		public DbSet<MedicalRecord> MedicalRecords { get; set; }
+		public DbSet<Prescription> Prescriptions { get; set; }
 	}
 }
