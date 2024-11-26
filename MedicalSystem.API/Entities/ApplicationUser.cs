@@ -13,5 +13,6 @@ namespace MedicalSystem.API.Entities
 		public int Age { get; set; }
 		public bool IsDisabled { get; set; }
 		public List<RefreshToken> RefreshToken { get; set; } = [];
+		public ICollection<MedicalRecord> MedicalRecords { get; set; } = [];
 	}
 }
