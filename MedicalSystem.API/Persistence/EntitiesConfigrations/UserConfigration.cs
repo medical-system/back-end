@@ -3,6 +3,7 @@ using MedicalSystem.API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
 
 namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 {
@@ -10,6 +11,11 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 	{
 		public void Configure(EntityTypeBuilder<ApplicationUser> builder)
 		{
+			builder.HasOne(u => u.Doctor)
+			   .WithMany()
+			   .HasForeignKey(u => u.DoctorId)
+			   .OnDelete(DeleteBehavior.Restrict);
+
 			builder.Property(x => x.FirstName).HasMaxLength(100);
 			builder.Property(x => x.LastName).HasMaxLength(100);
 
