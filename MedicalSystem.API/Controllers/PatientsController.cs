@@ -56,12 +56,5 @@ namespace MedicalSystem.API.Controllers
 			var result = await _patientService.GetPatientMedicalRecord(id, request, cancellationToken);
 			return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 		}
-
-		[HttpPut("{id}/toggle-status")]
-		public async Task<IActionResult> ToggleStatus([FromRoute] string id)
-		{
-			var result = await _patientService.ToggleStatus(id);
-			return result.IsSuccess ? NoContent() : result.ToProblem();
-		}
 	}
 }
