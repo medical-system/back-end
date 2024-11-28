@@ -30,10 +30,10 @@ namespace MedicalSystem.API.Controllers
 			return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 		}
 
-		[HttpPost("Add")]
-		public async Task<IActionResult> Add([FromBody] CreatePatientRequest request, CancellationToken cancellationToken)
+		[HttpPost("{id}/Add")]
+		public async Task<IActionResult> Add([FromRoute] string id, [FromBody] CreatePatientRequest request, CancellationToken cancellationToken)
 		{
-			var result = await _patientService.AddAsync(request, cancellationToken);
+			var result = await _patientService.AddAsync(id, request, cancellationToken);
 
 			return result.IsSuccess ? CreatedAtAction(nameof(GetById), new { result.Value.Id }, result.Value) : result.ToProblem();
 		}

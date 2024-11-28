@@ -12,6 +12,8 @@ namespace MedicalSystem.API.Entities
 		public string BloodyGroup { get; set; } = string.Empty;
 		public int Age { get; set; }
 		public bool IsDisabled { get; set; }
+		public string? DoctorId { get; set; }
+		public ApplicationUser Doctor { get; set; }
 		public List<RefreshToken> RefreshToken { get; set; } = [];
 		public ICollection<MedicalRecord> MedicalRecords { get; set; } = [];
 	}
