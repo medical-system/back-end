@@ -18,5 +18,6 @@ namespace MedicalSystem.API.Persistence
 		}
 		public DbSet<MedicalRecord> MedicalRecords { get; set; }
 		public DbSet<Prescription> Prescriptions { get; set; }
+		public DbSet<Medicine> Medicines { get; set; }
 	}
 }
