@@ -1,6 +1,7 @@
 
 using Hangfire;
 using HangfireBasicAuthenticationFilter;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 
 namespace MedicalSystem.API
@@ -31,6 +32,13 @@ namespace MedicalSystem.API
 			app.UseHangfireDashboard("/jobs");
 
 			app.UseHttpsRedirection();
+			app.UseStaticFiles( new StaticFileOptions
+			{
+				FileProvider = new PhysicalFileProvider(
+					Path.Combine(builder.Environment.ContentRootPath,
+					"Uploads")),
+				RequestPath ="/Resources"
+			});
 			app.UseCors();
 			app.UseAuthorization();
 

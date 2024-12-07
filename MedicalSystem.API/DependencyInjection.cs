@@ -50,6 +50,7 @@ namespace MedicalSystem.API
 			services.AddScoped<IReceptionService, ReceptionService>();
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IMedicineService, MedicineService>();
+			services.AddScoped<IFileService, FileService>();
 
 			services.AddMapsterConfig();
 			services.AddHttpContextAccessor();
