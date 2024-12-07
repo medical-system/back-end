@@ -31,7 +31,7 @@ namespace MedicalSystem.API.Controllers
 		}
 
 		[HttpPost("{id}/Add")]
-		public async Task<IActionResult> Add([FromRoute] string id, [FromBody] CreatePatientRequest request, CancellationToken cancellationToken)
+		public async Task<IActionResult> Add([FromRoute] string id, [FromForm] CreatePatientRequest request, CancellationToken cancellationToken)
 		{
 			var result = await _patientService.AddAsync(id, request, cancellationToken);
 

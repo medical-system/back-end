@@ -5,6 +5,7 @@
 		string Email,
 		string FullName,
 		string Password,
+		IFormFile? ImageUrl,
 		int Age,
 		string BloodyGroup
 	);

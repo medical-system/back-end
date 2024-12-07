@@ -16,11 +16,14 @@ namespace MedicalSystem.API.Services
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ILogger<PatientService> _logger;
-		public PatientService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<PatientService> logger)
+		private readonly string baseUrl =  "https://localhost:7132/Resources/Patients/";
+		private readonly IFileService _fileService;
+		public PatientService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<PatientService> logger, IFileService fileService)
 		{
 			_context = context;
 			_userManager = userManager;
 			_logger = logger;
+			_fileService = fileService;
 		}
 		public async Task<IEnumerable<PatientsResponse>> GetAllAsync(CancellationToken cancellationToken = default)
 		{
@@ -34,6 +37,7 @@ namespace MedicalSystem.API.Services
 								  (
 									 u.Id,
 									 u.FullName,
+									 baseUrl + u.ImageUrl,
 									 u.CreatedAt,
 									 u.BloodyGroup,
 									 u.Age,
@@ -51,7 +55,15 @@ namespace MedicalSystem.API.Services
 			if (!userRole.Contains(DefaultRoles.Patient))
 				return Result.Failure<PatientsResponse>(UserErrors.UserNotFound);
 
-			var response = user.Adapt<PatientsResponse>();
+			var response = new PatientsResponse(
+				user.Id,
+				baseUrl + user.ImageUrl,
+				user.FullName,
+				user.CreatedAt,
+				user.BloodyGroup,
+				user.Age,
+				user.IsDisabled
+			);
 			return Result.Success(response);
 		}
 
@@ -61,19 +73,27 @@ namespace MedicalSystem.API.Services
 			if (emailIsExists)
 				return Result.Failure<PatientsResponse>(UserErrors.DuplicatedEmail);
 
+			if (request.ImageUrl?.Length > 1 * 1024 * 1024)
+				return Result.Failure<PatientsResponse>(UserErrors.UserImageExcced1M);
+
+			string[] allowedFileExtensions = [".jpg", ".jpeg", ".png"];
+			string createdImageName = await _fileService.SaveFileAsync(request.ImageUrl!, allowedFileExtensions, ImageSubFolder.Patients);
+
 			var user = request.Adapt<ApplicationUser>();
 			string fullName = request.FullName;
 			string[] nameParts = fullName.Split(' ');
 			user.FirstName = nameParts[0];
+			
 			user.LastName = nameParts.Length > 1 ? nameParts[^1] : string.Empty;
 			user.Email = request.Email;
+			user.ImageUrl = createdImageName;
 			user.UserName = request.Email;
 			user.Password = request.Password;
 			user.EmailConfirmed = true;
 			user.FullName = request.FullName;
 			user.BloodyGroup = request.BloodyGroup;
 			user.Age = request.Age;
-			user.DoctorId = id;
+			user.DoctorId = id ?? string.Empty;
 
 			var result = await _userManager.CreateAsync(user, request.Password);
 
@@ -81,7 +101,15 @@ namespace MedicalSystem.API.Services
 			{
 				await _userManager.AddToRoleAsync(user, DefaultRoles.Patient);
 
-				var response = (user).Adapt<PatientsResponse>();
+				var response = new PatientsResponse(
+					user.Id,
+					baseUrl + createdImageName,
+					user.FullName,
+					user.CreatedAt,
+					user.BloodyGroup,
+					user.Age,
+					user.IsDisabled
+				);
 
 				return Result.Success(response);
 			}

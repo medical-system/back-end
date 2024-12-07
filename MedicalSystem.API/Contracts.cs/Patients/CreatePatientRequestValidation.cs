@@ -22,6 +22,10 @@ namespace MedicalSystem.API.Contracts.cs.Patients
 				.GreaterThan(0)
 				.LessThan(150);
 
+			RuleFor(x => x.ImageUrl)
+				.NotEmpty()
+				.NotNull();
+
 			RuleFor(x => x.BloodyGroup)
 				.NotEmpty()
 				.NotNull();
