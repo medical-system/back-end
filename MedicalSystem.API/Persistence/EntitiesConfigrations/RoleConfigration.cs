@@ -22,7 +22,8 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 					Id= DefaultRoles.UserRoleId,
 					Name = DefaultRoles.User,
 					NormalizedName = DefaultRoles.User.ToUpper(),
-					ConcurrencyStamp = DefaultRoles.UserRoleConcurrencyStamp
+					ConcurrencyStamp = DefaultRoles.UserRoleConcurrencyStamp,
+					IsDefault= true
 				},
 				new ApplicationRole
 				{

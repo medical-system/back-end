@@ -9,6 +9,7 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 	{
 		public void Configure(EntityTypeBuilder<MedicalRecord> builder)
 		{
+			builder.OwnsMany(x => x.Prescriptions).ToTable("Prescriptions").WithOwner().HasForeignKey("Id");
 			builder.Property(mr => mr.Id)
 				.ValueGeneratedOnAdd()
 				.UseIdentityColumn(1, 1);

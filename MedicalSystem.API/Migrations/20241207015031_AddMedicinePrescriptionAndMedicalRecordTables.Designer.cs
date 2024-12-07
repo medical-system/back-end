@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MedicalSystem.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241201201603_AddMedicineTable")]
-    partial class AddMedicineTable
+    [Migration("20241207015031_AddMedicinePrescriptionAndMedicalRecordTables")]
+    partial class AddMedicinePrescriptionAndMedicalRecordTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,7 +71,7 @@ namespace MedicalSystem.API.Migrations
                         {
                             Id = "9eaa03df-8e4f-4161-85de-0f6e5e30bfd4",
                             ConcurrencyStamp = "5ee6bc12-5cb0-4304-91e7-6a00744e042a",
-                            IsDefault = false,
+                            IsDefault = true,
                             IsDeleted = false,
                             Name = "User",
                             NormalizedName = "USER"
@@ -146,6 +146,10 @@ namespace MedicalSystem.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("bit");
 
@@ -213,18 +217,19 @@ namespace MedicalSystem.API.Migrations
                             Age = 0,
                             BloodyGroup = "",
                             ConcurrencyStamp = "99d2bbc6-bc54-4248-a172-a77de3ae4430",
-                            CreatedAt = new DateTime(2024, 12, 1, 20, 16, 2, 689, DateTimeKind.Utc).AddTicks(1225),
+                            CreatedAt = new DateTime(2024, 12, 7, 1, 50, 31, 180, DateTimeKind.Utc).AddTicks(9627),
                             Email = "admin@medical-system.com",
                             EmailConfirmed = true,
                             FirstName = "Medical System",
                             FullName = "Medical-System-Admin",
+                            ImageUrl = "",
                             IsDisabled = false,
                             LastName = "Admin",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MEDICAL-SYSTEM.COM",
                             NormalizedUserName = "ADMIN@MEDICAL-SYSTEM.COM",
                             Password = "P@ssword123",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL4+hINyTOraXsw99Nx4TAaVHjiTYVUsRyjafy+hKeTjOmn3krP2OlEAy60cPaM9JQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHiBkK9r7v0YnnZNWGiW+sPMxfVtjMJpn4riAEz/frDg4B6b1re4VQRc6SgW4Iznqg==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -300,45 +305,6 @@ namespace MedicalSystem.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Medicines");
-                });
-
-            modelBuilder.Entity("MedicalSystem.API.Entities.Prescription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Amout")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Dosage")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Instraction")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Item")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ItemPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MedicalRecordId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MedicalRecordId");
-
-                    b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -480,15 +446,49 @@ namespace MedicalSystem.API.Migrations
 
                             b1.HasKey("ApplicationUserId", "Id");
 
-                            b1.ToTable("RefreshToken");
+                            b1.ToTable("AspNetUsers_RefreshToken");
 
                             b1.WithOwner()
                                 .HasForeignKey("ApplicationUserId");
                         });
 
+                    b.OwnsMany("MedicalSystem.API.Entities.RefreshToken", "RefreshTokens", b1 =>
+                        {
+                            b1.Property<string>("UserId")
+                                .HasColumnType("nvarchar(450)");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<DateTime>("CreatedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime>("ExpiresOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime?>("RevokedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Token")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("UserId", "Id");
+
+                            b1.ToTable("RefreshTokens", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
                     b.Navigation("Doctor");
 
                     b.Navigation("RefreshToken");
+
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("MedicalSystem.API.Entities.MedicalRecord", b =>
@@ -496,15 +496,48 @@ namespace MedicalSystem.API.Migrations
                     b.HasOne("MedicalSystem.API.Entities.ApplicationUser", null)
                         .WithMany("MedicalRecords")
                         .HasForeignKey("ApplicationUserId");
-                });
 
-            modelBuilder.Entity("MedicalSystem.API.Entities.Prescription", b =>
-                {
-                    b.HasOne("MedicalSystem.API.Entities.MedicalRecord", null)
-                        .WithMany("Prescriptions")
-                        .HasForeignKey("MedicalRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsMany("MedicalSystem.API.Entities.Prescription", "Prescriptions", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Id1")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id1"));
+
+                            b1.Property<int>("Amout")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Dosage")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Instraction")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Item")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("ItemPrice")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id", "Id1");
+
+                            b1.ToTable("Prescriptions", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("Id");
+                        });
+
+                    b.Navigation("Prescriptions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -561,11 +594,6 @@ namespace MedicalSystem.API.Migrations
             modelBuilder.Entity("MedicalSystem.API.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("MedicalRecords");
-                });
-
-            modelBuilder.Entity("MedicalSystem.API.Entities.MedicalRecord", b =>
-                {
-                    b.Navigation("Prescriptions");
                 });
 #pragma warning restore 612, 618
         }
