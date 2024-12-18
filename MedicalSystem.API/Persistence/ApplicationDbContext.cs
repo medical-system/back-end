@@ -14,6 +14,7 @@ namespace MedicalSystem.API.Persistence
 		public DbSet<MedicalRecord> MedicalRecords { get; set; }
 		public DbSet<Prescription> Prescriptions { get; set; }
 		public DbSet<Medicine> Medicines { get; set; }
+		public DbSet<Service> Servicess { get; set; }
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
 		{
 			_httpContextAccessor = httpContextAccessor;
