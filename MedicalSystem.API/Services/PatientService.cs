@@ -6,6 +6,7 @@ using MedicalSystem.API.Contracts.cs.Patients;
 using MedicalSystem.API.Entities;
 using MedicalSystem.API.Errors;
 using MedicalSystem.API.Persistence;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,14 +17,15 @@ namespace MedicalSystem.API.Services
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ILogger<PatientService> _logger;
-		private readonly string baseUrl =  "https://localhost:7132/Resources/Patients/";
+		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly IFileService _fileService;
-		public PatientService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<PatientService> logger, IFileService fileService)
+		public PatientService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<PatientService> logger, IFileService fileService, IHttpContextAccessor httpContextAccessor)
 		{
 			_context = context;
 			_userManager = userManager;
 			_logger = logger;
 			_fileService = fileService;
+			_httpContextAccessor = httpContextAccessor;
 		}
 		public async Task<IEnumerable<PatientsResponse>> GetAllAsync(CancellationToken cancellationToken = default)
 		{
@@ -37,7 +39,7 @@ namespace MedicalSystem.API.Services
 								  (
 									 u.Id,
 									 u.FullName,
-									 baseUrl + u.ImageUrl,
+									 GetBaseUrl() + u.ImageUrl,
 									 u.CreatedAt,
 									 u.BloodyGroup,
 									 u.Age,
@@ -57,7 +59,7 @@ namespace MedicalSystem.API.Services
 
 			var response = new PatientsResponse(
 				user.Id,
-				baseUrl + user.ImageUrl,
+				GetBaseUrl() + user.ImageUrl,
 				user.FullName,
 				user.CreatedAt,
 				user.BloodyGroup,
@@ -73,17 +75,12 @@ namespace MedicalSystem.API.Services
 			if (emailIsExists)
 				return Result.Failure<PatientsResponse>(UserErrors.DuplicatedEmail);
 
-			if (request.ImageUrl?.Length > 1 * 1024 * 1024)
-				return Result.Failure<PatientsResponse>(UserErrors.UserImageExcced1M);
-
-			string[] allowedFileExtensions = [".jpg", ".jpeg", ".png"];
-			string createdImageName = await _fileService.SaveFileAsync(request.ImageUrl!, allowedFileExtensions, ImageSubFolder.Patients);
-
 			var user = request.Adapt<ApplicationUser>();
 			string fullName = request.FullName;
 			string[] nameParts = fullName.Split(' ');
 			user.FirstName = nameParts[0];
-			
+			string createdImageName = await _fileService.SaveFileAsync(request.ImageUrl!, ImageSubFolder.Patients);
+
 			user.LastName = nameParts.Length > 1 ? nameParts[^1] : string.Empty;
 			user.Email = request.Email;
 			user.ImageUrl = createdImageName;
@@ -103,7 +100,7 @@ namespace MedicalSystem.API.Services
 
 				var response = new PatientsResponse(
 					user.Id,
-					baseUrl + createdImageName,
+					GetBaseUrl() + createdImageName,
 					user.FullName,
 					user.CreatedAt,
 					user.BloodyGroup,
@@ -173,6 +170,14 @@ namespace MedicalSystem.API.Services
 			var response = medicalRecord.Adapt<MedicalRecordResponse>();
 
 			return Result.Success(response);
+		}
+		private string GetBaseUrl()
+		{
+			var request = _httpContextAccessor.HttpContext?.Request;
+			if (request == null)
+				throw new InvalidOperationException("HttpContext is not available.");
+
+			return $"{request.Scheme}://{request.Host}/images/Patient/";
 		}
 	}
 }

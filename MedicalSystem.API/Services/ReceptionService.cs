@@ -11,13 +11,9 @@ namespace MedicalSystem.API.Services
 	public class ReceptionService : IReceptionService
 	{
 		private readonly ApplicationDbContext _context;
-		private readonly UserManager<ApplicationUser> _userManager;
-		private readonly ILogger<ReceptionService> _logger;
 		public ReceptionService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<ReceptionService> logger)
 		{
 			_context = context;
-			_userManager = userManager;
-			_logger = logger;
 		}
 
 		public async Task<IEnumerable<ReceptionResponse>> GetAllAsync(CancellationToken cancellationToken = default)

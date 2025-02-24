@@ -2,12 +2,11 @@
 
 namespace MedicalSystem.API.Contracts.cs.Servicess
 {
-	public record ServicessResponse
+	public record ServicessRequest
 	(
-		int Id,
 		string Name,
-		DateTime CreatedAt,
 		decimal Price,
-		ServiceStatus Status
+		string Descriptions,
+		MedicineStatus Status
 	);
 }

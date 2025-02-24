@@ -28,7 +28,7 @@ namespace MedicalSystem.API.Services
 		}
 		public async Task<Result<ServicessResponse>> GetServicessByIdAsync(int id)
 		{
-			var IsExist = await _context.Servicess.AnyAsync(x => x.Id == id && x.Status != Status.Disabled);
+			var IsExist = await _context.Servicess.AnyAsync(x => x.Id == id && x.Status != ServiceStatus.Disabled);
 			if (!IsExist)
 				return Result.Failure<ServicessResponse>(ServicessErrors.ServiceNotFound);
 			var servicess = await _context.Servicess.FindAsync(id);

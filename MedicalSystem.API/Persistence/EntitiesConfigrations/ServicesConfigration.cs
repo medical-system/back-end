@@ -14,8 +14,12 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 			builder.Property(m => m.Price)
 				.HasColumnType("decimal(18,2)");
 
-			builder.Property(p => p.Status)
-			  .HasConversion(p => p.ToString(), Statu => (Status)Enum.Parse(typeof(Status), Statu));
+			builder.Property(service => service.Status)
+				.HasConversion
+				(
+					(OStatus) => OStatus.ToString(),
+					(OStatus) => (ServiceStatus)Enum.Parse(typeof(ServiceStatus), OStatus)
+				);
 		}
 	}
 }
