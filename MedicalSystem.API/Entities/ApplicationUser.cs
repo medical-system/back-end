@@ -9,6 +9,7 @@ namespace MedicalSystem.API.Entities
 		public string FullName { get; set; } = string.Empty;
 		public string Password { get; set; } = string.Empty;
 		public string ImageUrl { get; set; } = string.Empty;
+		public string Gender { get; set; } = string.Empty;
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 		public string BloodyGroup { get; set; } = string.Empty;
 		public int Age { get; set; }
