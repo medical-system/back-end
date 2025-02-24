@@ -1,6 +1,7 @@
 ﻿using MedicalSystem.API.Abstractions;
 using MedicalSystem.API.Contracts.cs.MedicalRecord;
 using MedicalSystem.API.Contracts.cs.Patients;
+using MedicalSystem.API.Extensions;
 using MedicalSystem.API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -30,12 +31,12 @@ namespace MedicalSystem.API.Controllers
 			return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 		}
 
-		[HttpPost("{id}/Add")]
-		public async Task<IActionResult> Add([FromRoute] string id, [FromForm] CreatePatientRequest request, CancellationToken cancellationToken)
+		[HttpPost("Add")]
+		public async Task<IActionResult> Add([FromForm] CreatePatientRequest request, CancellationToken cancellationToken)
 		{
-			var result = await _patientService.AddAsync(id, request, cancellationToken);
+			var result = await _patientService.AddAsync(User.GetUserId()! ,request, cancellationToken);
 
-			return result.IsSuccess ? CreatedAtAction(nameof(GetById), new { result.Value.Id }, result.Value) : result.ToProblem();
+			return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 		}
 
 		[HttpGet("{id}/medical-record")]
