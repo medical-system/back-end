@@ -4,6 +4,7 @@ using MedicalSystem.API.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MedicalSystem.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250224191509_MakeImageUrlNullable")]
+    partial class MakeImageUrlNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,7 +275,7 @@ namespace MedicalSystem.API.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("MedicalRecords", (string)null);
+                    b.ToTable("MedicalRecords");
                 });
 
             modelBuilder.Entity("MedicalSystem.API.Entities.Medicine", b =>
@@ -302,7 +305,7 @@ namespace MedicalSystem.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Medicines", (string)null);
+                    b.ToTable("Medicines");
                 });
 
             modelBuilder.Entity("MedicalSystem.API.Entities.Service", b =>
@@ -347,7 +350,7 @@ namespace MedicalSystem.API.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Servicess", (string)null);
+                    b.ToTable("Servicess");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -463,7 +466,7 @@ namespace MedicalSystem.API.Migrations
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsMany("MedicalSystem.API.Entities.ApplicationUser.RefreshToken#MedicalSystem.API.Entities.RefreshToken", "RefreshToken", b1 =>
+                    b.OwnsMany("MedicalSystem.API.Entities.RefreshToken", "RefreshToken", b1 =>
                         {
                             b1.Property<string>("ApplicationUserId")
                                 .HasColumnType("nvarchar(450)");
@@ -489,13 +492,13 @@ namespace MedicalSystem.API.Migrations
 
                             b1.HasKey("ApplicationUserId", "Id");
 
-                            b1.ToTable("AspNetUsers_RefreshToken", (string)null);
+                            b1.ToTable("AspNetUsers_RefreshToken");
 
                             b1.WithOwner()
                                 .HasForeignKey("ApplicationUserId");
                         });
 
-                    b.OwnsMany("MedicalSystem.API.Entities.ApplicationUser.RefreshTokens#MedicalSystem.API.Entities.RefreshToken", "RefreshTokens", b1 =>
+                    b.OwnsMany("MedicalSystem.API.Entities.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<string>("UserId")
                                 .HasColumnType("nvarchar(450)");
@@ -541,7 +544,7 @@ namespace MedicalSystem.API.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.OwnsMany("MedicalSystem.API.Entities.MedicalRecord.Prescriptions#MedicalSystem.API.Entities.Prescription", "Prescriptions", b1 =>
+                    b.OwnsMany("MedicalSystem.API.Entities.Prescription", "Prescriptions", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .HasColumnType("int");

@@ -69,7 +69,7 @@ namespace MedicalSystem.API.Services
 			return Result.Success(response);
 		}
 
-		public async Task<Result<PatientsResponse>> AddAsync(string id, CreatePatientRequest request, CancellationToken cancellationToken = default)
+		public async Task<Result<PatientsResponse>> AddAsync(string doctorId,CreatePatientRequest request, CancellationToken cancellationToken = default)
 		{
 			var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
 			if (emailIsExists)
@@ -79,18 +79,22 @@ namespace MedicalSystem.API.Services
 			string fullName = request.FullName;
 			string[] nameParts = fullName.Split(' ');
 			user.FirstName = nameParts[0];
+			if(request.ImageUrl is not null)
+			{
 			string createdImageName = await _fileService.SaveFileAsync(request.ImageUrl!, ImageSubFolder.Patients);
+
+			user.ImageUrl = createdImageName;
+			}
 
 			user.LastName = nameParts.Length > 1 ? nameParts[^1] : string.Empty;
 			user.Email = request.Email;
-			user.ImageUrl = createdImageName;
 			user.UserName = request.Email;
 			user.Password = request.Password;
 			user.EmailConfirmed = true;
 			user.FullName = request.FullName;
 			user.BloodyGroup = request.BloodyGroup;
 			user.Age = request.Age;
-			user.DoctorId = id ?? string.Empty;
+			user.DoctorId = doctorId ?? string.Empty;
 
 			var result = await _userManager.CreateAsync(user, request.Password);
 
@@ -98,17 +102,12 @@ namespace MedicalSystem.API.Services
 			{
 				await _userManager.AddToRoleAsync(user, DefaultRoles.Patient);
 
-				var response = new PatientsResponse(
-					user.Id,
-					GetBaseUrl() + createdImageName,
-					user.FullName,
-					user.CreatedAt,
-					user.BloodyGroup,
-					user.Age,
-					user.IsDisabled
-				);
+				var response = result.Adapt<PatientsResponse>();
+
+				await _context.SaveChangesAsync();
 
 				return Result.Success(response);
+
 			}
 
 			var error = result.Errors.First();
