@@ -6,7 +6,7 @@ namespace MedicalSystem.API.Contracts.cs.Medicines
 	(
 		string Name,
 		decimal Price,
-		Status Status,
+		MedicineStatus Status,
 		int InStock,
 		int Measure
 	);

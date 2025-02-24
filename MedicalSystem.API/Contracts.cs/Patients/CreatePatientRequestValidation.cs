@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MedicalSystem.API.Abstractions.Consts;
 using MedicalSystem.API.Contracts.cs.Authentication;
+using MedicalSystem.API.Contracts.cs.Files;
 
 namespace MedicalSystem.API.Contracts.cs.Patients
 {
@@ -23,8 +24,8 @@ namespace MedicalSystem.API.Contracts.cs.Patients
 				.LessThan(150);
 
 			RuleFor(x => x.ImageUrl)
-				.NotEmpty()
-				.NotNull();
+				.SetValidator(new BlockedSignaturesValidator()!)
+				.SetValidator(new FileSizeValidator()!);
 
 			RuleFor(x => x.BloodyGroup)
 				.NotEmpty()
