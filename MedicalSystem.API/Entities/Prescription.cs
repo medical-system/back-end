@@ -2,7 +2,6 @@
 
 namespace MedicalSystem.API.Entities
 {
-    [Owned]
 	public class Prescription
 	{
         public int Item { get; set; }
