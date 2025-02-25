@@ -11,7 +11,7 @@ namespace MedicalSystem.API.Services
 		public Task<Result<PatientsResponse>> GetAsync(string id);
 		public Task<Result<PatientsResponse>> AddAsync(string doctorId, CreatePatientRequest request, CancellationToken cancellationToken = default);
 		public Task<int> GetTotalPatientsAsync(CancellationToken cancellationToken = default);
-		public Task<IEnumerable<MedicalRecord>> GetAllMedicalRecordAsync(string userId, CancellationToken cancellationToken = default);
-		public Task<Result<MedicalRecordResponse>> GetPatientMedicalRecord(string id, CreateMedicalRecordRequest request, CancellationToken cancellationToken = default);
+		public Task<IEnumerable<MedicalRecordResponse>> GetAllMedicalRecordAsync(string userId, CancellationToken cancellationToken = default);
+		public Task<Result<MedicalRecordResponse>> AddPatientMedicalRecord(string id, CreateMedicalRecordRequest request, CancellationToken cancellationToken = default);
 	}
 }

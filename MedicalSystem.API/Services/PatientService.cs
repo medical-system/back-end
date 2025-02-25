@@ -38,8 +38,8 @@ namespace MedicalSystem.API.Services
 								  select new PatientsResponse
 								  (
 									 u.Id,
+									 u.ImageUrl!,
 									 u.FullName,
-									 GetBaseUrl() + u.ImageUrl,
 									 u.CreatedAt,
 									 u.BloodyGroup,
 									 u.Age,
@@ -59,7 +59,7 @@ namespace MedicalSystem.API.Services
 
 			var response = new PatientsResponse(
 				user.Id,
-				GetBaseUrl() + user.ImageUrl,
+				user.ImageUrl,
 				user.FullName,
 				user.CreatedAt,
 				user.BloodyGroup,
@@ -79,35 +79,32 @@ namespace MedicalSystem.API.Services
 			string fullName = request.FullName;
 			string[] nameParts = fullName.Split(' ');
 			user.FirstName = nameParts[0];
-			if(request.ImageUrl is not null)
-			{
-			string createdImageName = await _fileService.SaveFileAsync(request.ImageUrl!, ImageSubFolder.Patients);
-
-			user.ImageUrl = createdImageName;
-			}
-
 			user.LastName = nameParts.Length > 1 ? nameParts[^1] : string.Empty;
-			user.Email = request.Email;
-			user.UserName = request.Email;
-			user.Password = request.Password;
-			user.EmailConfirmed = true;
-			user.FullName = request.FullName;
-			user.BloodyGroup = request.BloodyGroup;
-			user.Age = request.Age;
-			user.DoctorId = doctorId ?? string.Empty;
-
+			user.DoctorId = doctorId;
+			if (request.ImageUrl is not null)
+			{
+				string createdImageName = await _fileService.SaveFileAsync(request.ImageUrl!, ImageSubFolder.Patients);
+				user.ImageUrl = GetBaseUrl() + createdImageName;
+			}
 			var result = await _userManager.CreateAsync(user, request.Password);
 
 			if (result.Succeeded)
 			{
 				await _userManager.AddToRoleAsync(user, DefaultRoles.Patient);
 
-				var response = result.Adapt<PatientsResponse>();
+				var response = new PatientsResponse(
+					user.Id,
+					user.ImageUrl,
+					user.FullName,
+					user.CreatedAt,
+					user.BloodyGroup,
+					user.Age,
+					user.IsDisabled
+				);
 
 				await _context.SaveChangesAsync();
 
 				return Result.Success(response);
-
 			}
 
 			var error = result.Errors.First();
@@ -126,17 +123,17 @@ namespace MedicalSystem.API.Services
 									   select u.Id).CountAsync(cancellationToken);
 			return totalPatients;
 		}
-		public async Task<IEnumerable<MedicalRecord>> GetAllMedicalRecordAsync(string userId, CancellationToken cancellationToken = default)
+		public async Task<IEnumerable<MedicalRecordResponse>> GetAllMedicalRecordAsync(string userId, CancellationToken cancellationToken = default)
 		{
 			var medicalRecords = await _context.MedicalRecords
 										.Where(mr => mr.PatientId == userId)
 										.Include(mr => mr.Prescriptions)
 										.ToListAsync(cancellationToken);
 
-			return medicalRecords;
+			return medicalRecords.Adapt<IEnumerable<MedicalRecordResponse>>();
 		}
 
-		public async Task<Result<MedicalRecordResponse>> GetPatientMedicalRecord(string id, CreateMedicalRecordRequest request, CancellationToken cancellationToken = default)
+		public async Task<Result<MedicalRecordResponse>> AddPatientMedicalRecord(string id, CreateMedicalRecordRequest request, CancellationToken cancellationToken = default)
 		{
 			if (await _userManager.FindByIdAsync(id) is not { } user)
 				return Result.Failure<MedicalRecordResponse>(UserErrors.UserNotFound);
@@ -145,23 +142,8 @@ namespace MedicalSystem.API.Services
 			if (!userRole.Contains(DefaultRoles.Patient))
 				return Result.Failure<MedicalRecordResponse>(UserErrors.UserNotFound);
 
-			var medicalRecord = new MedicalRecord
-			{
-				PatientId = id,
-				Complaint = request.Complaint,
-				Date = request.Date,
-				Diagnosis = request.Diagnosis,
-				Treatment = request.Treatment,
-				VitalSigns = request.VitalSigns,
-				Prescriptions = request.Prescriptions.Select(p => new Prescription
-				{
-					ItemPrice = p.ItemPrice,
-					Dosage = p.Dosage,
-					Instraction = p.Instraction,
-					Quantity = p.Quantity,
-					Amout = p.Amout
-				}).ToList()
-			};
+			var medicalRecord = request.Adapt<MedicalRecord>();
+			medicalRecord.PatientId = id;
 
 			_context.MedicalRecords.Add(medicalRecord);
 			await _context.SaveChangesAsync(cancellationToken);
