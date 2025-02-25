@@ -9,10 +9,29 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 	{
 		public void Configure(EntityTypeBuilder<MedicalRecord> builder)
 		{
-			builder.OwnsMany(x => x.Prescriptions).ToTable("Prescriptions").WithOwner().HasForeignKey("Id");
+			builder.OwnsMany(medical => medical.Prescriptions, prescriptions => prescriptions.WithOwner());
 			builder.Property(mr => mr.Id)
 				.ValueGeneratedOnAdd()
 				.UseIdentityColumn(1, 1);
+
+			builder.HasOne(m => m.CreatedBy)
+			.WithMany()  // No navigation property back
+			.HasForeignKey(m => m.CreatedById)
+			.OnDelete(DeleteBehavior.NoAction);
+
+			// UpdatedBy relationship - Optional, restrict deletion (instead of SetNull)
+			builder.HasOne(m => m.UpdatedBy)
+				.WithMany()
+				.HasForeignKey(m => m.UpdatedById)
+				.OnDelete(DeleteBehavior.NoAction)  // Changed to Restrict
+				.IsRequired(false);
+
+			// Patient relationship - Optional, restrict deletion (instead of SetNull)
+			builder.HasOne<ApplicationUser>()  // No navigation property in MedicalRecord
+				.WithMany(u => u.MedicalRecords)
+				.HasForeignKey(m => m.PatientId)
+				.OnDelete(DeleteBehavior.NoAction)  // Changed to Restrict
+				.IsRequired(false);
 		}
 	}
 }

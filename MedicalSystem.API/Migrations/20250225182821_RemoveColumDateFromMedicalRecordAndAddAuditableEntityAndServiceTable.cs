@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MedicalSystem.API.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMedicinePrescriptionAndMedicalRecordTables : Migration
+    public partial class RemoveColumDateFromMedicalRecordAndAddAuditableEntityAndServiceTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,11 +44,17 @@ namespace MedicalSystem.API.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "ImageUrl",
+                name: "Gender",
                 table: "AspNetUsers",
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "ImageUrl",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: true);
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers_RefreshToken",
@@ -79,20 +85,32 @@ namespace MedicalSystem.API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PatientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PatientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Complaint = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Diagnosis = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Treatment = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VitalSigns = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CreatedById = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedById = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MedicalRecords", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MedicalRecords_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
+                        name: "FK_MedicalRecords_AspNetUsers_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_MedicalRecords_AspNetUsers_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_MedicalRecords_AspNetUsers_UpdatedById",
+                        column: x => x.UpdatedById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
@@ -105,7 +123,7 @@ namespace MedicalSystem.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     InStock = table.Column<int>(type: "int", nullable: false),
                     Measure = table.Column<int>(type: "int", nullable: false)
                 },
@@ -138,11 +156,42 @@ namespace MedicalSystem.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Servicess",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedById = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedById = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Servicess", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Servicess_AspNetUsers_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Servicess_AspNetUsers_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Prescriptions",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Id1 = table.Column<int>(type: "int", nullable: false)
+                    MedicalRecordId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Item = table.Column<int>(type: "int", nullable: false),
                     ItemPrice = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -153,10 +202,10 @@ namespace MedicalSystem.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Prescriptions", x => new { x.Id, x.Id1 });
+                    table.PrimaryKey("PK_Prescriptions", x => new { x.MedicalRecordId, x.Id });
                     table.ForeignKey(
-                        name: "FK_Prescriptions_MedicalRecords_Id",
-                        column: x => x.Id,
+                        name: "FK_Prescriptions_MedicalRecords_MedicalRecordId",
+                        column: x => x.MedicalRecordId,
                         principalTable: "MedicalRecords",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -183,8 +232,8 @@ namespace MedicalSystem.API.Migrations
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "6dc6528a-b280-4770-9eae-82671ee81ef7",
-                columns: new[] { "Age", "BloodyGroup", "CreatedAt", "DoctorId", "FullName", "ImageUrl", "Password", "PasswordHash" },
-                values: new object[] { 0, "", new DateTime(2024, 12, 7, 1, 50, 31, 180, DateTimeKind.Utc).AddTicks(9627), null, "Medical-System-Admin", "", "P@ssword123", "AQAAAAIAAYagAAAAEHiBkK9r7v0YnnZNWGiW+sPMxfVtjMJpn4riAEz/frDg4B6b1re4VQRc6SgW4Iznqg==" });
+                columns: new[] { "Age", "BloodyGroup", "CreatedAt", "DoctorId", "FullName", "Gender", "ImageUrl", "Password", "PasswordHash" },
+                values: new object[] { 0, "", new DateTime(2025, 2, 25, 18, 28, 20, 733, DateTimeKind.Utc).AddTicks(6350), null, "Medical-System-Admin", "", "", "P@ssword123", "AQAAAAIAAYagAAAAEKSzoFBWSWNy2AQ5XTptnr7J/HRbFE2KZ1sEUwEy6RDCv7umtT9Fjg0OxwijttMMaQ==" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_DoctorId",
@@ -192,9 +241,29 @@ namespace MedicalSystem.API.Migrations
                 column: "DoctorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MedicalRecords_ApplicationUserId",
+                name: "IX_MedicalRecords_CreatedById",
                 table: "MedicalRecords",
-                column: "ApplicationUserId");
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicalRecords_PatientId",
+                table: "MedicalRecords",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicalRecords_UpdatedById",
+                table: "MedicalRecords",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Servicess_CreatedById",
+                table: "Servicess",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Servicess_UpdatedById",
+                table: "Servicess",
+                column: "UpdatedById");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUsers_AspNetUsers_DoctorId",
@@ -223,6 +292,9 @@ namespace MedicalSystem.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "Servicess");
 
             migrationBuilder.DropTable(
                 name: "MedicalRecords");
@@ -260,6 +332,10 @@ namespace MedicalSystem.API.Migrations
 
             migrationBuilder.DropColumn(
                 name: "DoctorId",
+                table: "AspNetUsers");
+
+            migrationBuilder.DropColumn(
+                name: "Gender",
                 table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
