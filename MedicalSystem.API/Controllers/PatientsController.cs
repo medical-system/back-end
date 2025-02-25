@@ -54,7 +54,7 @@ namespace MedicalSystem.API.Controllers
 		[HttpPost("{id}/medical-record")]
 		public async Task<IActionResult> AddMedicalRecord([FromRoute] string id, [FromBody] CreateMedicalRecordRequest request, CancellationToken cancellationToken)
 		{
-			var result = await _patientService.GetPatientMedicalRecord(id, request, cancellationToken);
+			var result = await _patientService.AddPatientMedicalRecord(id, request, cancellationToken);
 			return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 		}
 	}

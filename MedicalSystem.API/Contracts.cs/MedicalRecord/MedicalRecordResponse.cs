@@ -7,7 +7,6 @@ namespace MedicalSystem.API.Contracts.cs.MedicalRecord
 		int id,
 		string PatientId,
 		string Complaint,
-		DateTime Date,
 		string Diagnosis,
 		string Treatment,
 		string VitalSigns,

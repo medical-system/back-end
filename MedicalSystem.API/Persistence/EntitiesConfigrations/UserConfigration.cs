@@ -20,7 +20,7 @@ namespace MedicalSystem.API.Persistence.EntitiesConfigrations
 			builder.HasMany(u => u.MedicalRecords)
 			.WithOne()
 			.HasForeignKey(mr => mr.PatientId)
-			.OnDelete(DeleteBehavior.Cascade);
+			.OnDelete(DeleteBehavior.NoAction);
 
 			builder.Property(x => x.FirstName).HasMaxLength(100);
 			builder.Property(x => x.LastName).HasMaxLength(100);

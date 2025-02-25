@@ -6,7 +6,6 @@ namespace MedicalSystem.API.Contracts.cs.MedicalRecord
     public record CreateMedicalRecordRequest
     (
         string Complaint,
-        DateTime Date,
         string Diagnosis,
         string Treatment,
         string VitalSigns,

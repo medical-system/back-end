@@ -3,7 +3,7 @@
 	public record PatientsResponse
 	(
 		string Id,
-		string ImageUrl,
+		string? ImageUrl,
 		string FullName,
 		DateTime CreatedAt,
 		string BloodyGroup,
